@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Genesys Cloud Call Widget</title>
+    <style>
+      :root {
+        --bg-1: #020617;
+        --bg-2: #0f172a;
+        --card: rgba(15, 23, 42, 0.76);
+        --card-border: rgba(255, 255, 255, 0.12);
+        --text: #e5eefb;
+        --muted: #9fb2cc;
+        --accent: #38bdf8;
+        --accent-2: #60a5fa;
+        --danger-bg: rgba(244, 63, 94, 0.12);
+        --danger-border: rgba(244, 63, 94, 0.3);
+        --success-bg: rgba(16, 185, 129, 0.12);
+        --success-border: rgba(16, 185, 129, 0.3);
+        --input: rgba(2, 6, 23, 0.7);
+        --shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+        --radius: 24px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top right, rgba(96, 165, 250, 0.18), transparent 28%),
+          radial-gradient(circle at bottom left, rgba(56, 189, 248, 0.12), transparent 28%),
+          linear-gradient(145deg, var(--bg-1), var(--bg-2));
+        padding: 32px 16px;
+      }
+
+      .shell {
+        max-width: 1040px;
+        margin: 0 auto;
+      }
+
+      .card {
+        overflow: hidden;
+        border-radius: 32px;
+        background: var(--card);
+        border: 1px solid var(--card-border);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(18px);
+      }
+
+      .hero {
+        padding: 32px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        background: linear-gradient(90deg, rgba(59, 130, 246, 0.18), rgba(6, 182, 212, 0.08), transparent);
+      }
+
+      .eyebrow {
+        margin: 0 0 12px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: #7dd3fc;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2rem, 3vw, 2.5rem);
+        line-height: 1.05;
+      }
+
+      .subtext {
+        margin: 14px 0 0;
+        max-width: 760px;
+        color: var(--muted);
+        line-height: 1.6;
+        font-size: 14px;
+      }
+
+      .content {
+        display: grid;
+        gap: 24px;
+        padding: 32px;
+      }
+
+      .panel {
+        border: 1px solid rgba(56, 189, 248, 0.14);
+        background: rgba(15, 23, 42, 0.55);
+        border-radius: var(--radius);
+        padding: 22px;
+      }
+
+      .panel-title {
+        margin: 0 0 18px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #7dd3fc;
+      }
+
+      form {
+        display: grid;
+        gap: 18px;
+      }
+
+      .field {
+        display: grid;
+        gap: 8px;
+      }
+
+      .field.two-col {
+        grid-template-columns: 180px 1fr;
+        align-items: center;
+        gap: 16px;
+      }
+
+      label span {
+        display: inline-block;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      input,
+      select,
+      textarea,
+      button {
+        font: inherit;
+      }
+
+      input,
+      select {
+        width: 100%;
+        min-height: 48px;
+        padding: 12px 14px;
+        color: var(--text);
+        background: var(--input);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 18px;
+        outline: none;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+      }
+
+      input::placeholder {
+        color: #7f93af;
+      }
+
+      input:focus,
+      select:focus {
+        border-color: rgba(56, 189, 248, 0.9);
+        box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
+      }
+
+      input[readonly] {
+        opacity: 0.72;
+        cursor: not-allowed;
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        align-items: center;
+        padding-top: 8px;
+      }
+
+      button {
+        border: 0;
+        border-radius: 18px;
+        min-height: 50px;
+        padding: 0 24px;
+        font-weight: 700;
+        cursor: pointer;
+        color: #03111f;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        box-shadow: 0 18px 40px rgba(56, 189, 248, 0.28);
+        transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 24px 44px rgba(56, 189, 248, 0.34);
+      }
+
+      button:disabled {
+        opacity: 0.65;
+        cursor: wait;
+        transform: none;
+      }
+
+      .help {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .message {
+        border-radius: 18px;
+        padding: 14px 16px;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      .message.error {
+        border: 1px solid var(--danger-border);
+        background: var(--danger-bg);
+        color: #fecdd3;
+      }
+
+      .message.success {
+        border: 1px solid var(--success-border);
+        background: var(--success-bg);
+        color: #d1fae5;
+      }
+
+      pre {
+        margin: 12px 0 0;
+        padding: 14px;
+        overflow: auto;
+        background: rgba(2, 6, 23, 0.65);
+        border-radius: 16px;
+        color: #dbeafe;
+        font-size: 12px;
+      }
+
+      code.inline {
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.8);
+        color: #bae6fd;
+        font-size: 12px;
+      }
+
+      @media (max-width: 760px) {
+        .hero,
+        .content {
+          padding: 22px;
+        }
+
+        .field.two-col,
+        .grid-2 {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="card">
+        <div class="hero">
+          <p class="eyebrow">Genesys Cloud Widget</p>
+          <h1>Place a call</h1>
+          <p class="subtext">
+            Upload-ready single-page widget that posts to
+            <span class="inline-code"><code class="inline">/api/v2/conversations/calls</code></span>
+            when <strong>Place Call</strong> is selected. The JSON body uses the webpage
+            <strong>Dialed Number</strong> as <code class="inline">phoneNumber</code> and
+            <strong>My Number</strong> as <code class="inline">callerId</code>.
+          </p>
+        </div>
+
+        <div class="content">
+          <section class="panel">
+            <h2 class="panel-title">Connection</h2>
+            <div class="grid-2">
+              <label class="field">
+                <span>API Region</span>
+                <select id="apiRegion">
+                  <option value="mypurecloud.com">mypurecloud.com</option>
+                  <option value="mypurecloud.ie">mypurecloud.ie</option>
+                  <option value="usw2.pure.cloud">usw2.pure.cloud</option>
+                  <option value="cac1.pure.cloud">cac1.pure.cloud</option>
+                  <option value="mypurecloud.de">mypurecloud.de</option>
+                  <option value="euw2.pure.cloud">euw2.pure.cloud</option>
+                  <option value="aps1.pure.cloud">aps1.pure.cloud</option>
+                </select>
+              </label>
+
+              <label class="field">
+                <span>Access Token</span>
+                <input id="accessToken" type="password" placeholder="Paste OAuth token" />
+              </label>
+            </div>
+            <p class="help">
+              This version sends the API request directly from the browser, so it needs a valid Genesys Cloud OAuth access token.
+            </p>
+          </section>
+
+          <form id="callForm">
+            <label class="field two-col">
+              <span>My Number</span>
+              <input id="myNumber" type="text" placeholder="Enter your number" />
+            </label>
+
+            <label class="field two-col">
+              <span>Dialed Number</span>
+              <input id="dialedNumber" type="text" placeholder="Enter destination number" />
+            </label>
+
+            <label class="field two-col">
+              <span>Caller ID Name</span>
+              <input id="callerIdName" type="text" value="Company Name" placeholder="Enter caller ID display name" />
+            </label>
+
+            <label class="field two-col">
+              <span>Caller ID</span>
+              <input id="callerIdMirror" type="text" readonly placeholder="Uses My Number automatically" />
+            </label>
+
+            <label class="field two-col">
+              <span>UUI Data</span>
+              <input id="uuiData" type="text" placeholder="Optional UI field" />
+            </label>
+
+            <div class="grid-2">
+              <label class="field">
+                <span>Date / Time</span>
+                <input id="dateTime" type="datetime-local" value="2026-04-10T09:55" />
+              </label>
+
+              <label class="field">
+                <span>Time Zone</span>
+                <select id="timeZone">
+                  <option>Africa/Johannesburg</option>
+                  <option>UTC</option>
+                  <option>Europe/London</option>
+                  <option>America/New_York</option>
+                  <option>Asia/Dubai</option>
+                </select>
+              </label>
+            </div>
+
+            <div id="errorBox" class="message error" style="display:none"></div>
+            <div id="successBox" class="message success" style="display:none"></div>
+
+            <div class="actions">
+              <button id="submitButton" type="submit">Place Call</button>
+              <code class="inline">payload = { phoneNumber: dialedNumber, callerId: myNumber, callerIdName }</code>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const form = document.getElementById("callForm");
+      const myNumberInput = document.getElementById("myNumber");
+      const dialedNumberInput = document.getElementById("dialedNumber");
+      const callerIdNameInput = document.getElementById("callerIdName");
+      const callerIdMirrorInput = document.getElementById("callerIdMirror");
+      const accessTokenInput = document.getElementById("accessToken");
+      const apiRegionInput = document.getElementById("apiRegion");
+      const submitButton = document.getElementById("submitButton");
+      const errorBox = document.getElementById("errorBox");
+      const successBox = document.getElementById("successBox");
+
+      function setError(message) {
+        successBox.style.display = "none";
+        successBox.innerHTML = "";
+        errorBox.style.display = "block";
+        errorBox.textContent = message;
+      }
+
+      function setSuccess(message, data) {
+        errorBox.style.display = "none";
+        errorBox.textContent = "";
+        successBox.style.display = "block";
+        successBox.innerHTML = "<strong>" + message + "</strong>" +
+          (data ? "<pre>" + escapeHtml(JSON.stringify(data, null, 2)) + "</pre>" : "");
+      }
+
+      function clearMessages() {
+        errorBox.style.display = "none";
+        errorBox.textContent = "";
+        successBox.style.display = "none";
+        successBox.innerHTML = "";
+      }
+
+      function escapeHtml(value) {
+        return value
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function syncCallerIdMirror() {
+        callerIdMirrorInput.value = myNumberInput.value.trim();
+      }
+
+      myNumberInput.addEventListener("input", syncCallerIdMirror);
+      syncCallerIdMirror();
+
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        clearMessages();
+
+        const accessToken = accessTokenInput.value.trim();
+        const myNumber = myNumberInput.value.trim();
+        const dialedNumber = dialedNumberInput.value.trim();
+        const callerIdName = callerIdNameInput.value.trim() || "Company Name";
+        const apiRegion = apiRegionInput.value;
+
+        if (!accessToken) {
+          setError("Enter a valid OAuth access token before placing the call.");
+          return;
+        }
+
+        if (!myNumber) {
+          setError("My Number is required.");
+          return;
+        }
+
+        if (!dialedNumber) {
+          setError("Dialed Number is required.");
+          return;
+        }
+
+        const payload = {
+          phoneNumber: dialedNumber,
+          callerId: myNumber,
+          callerIdName: callerIdName
+        };
+
+        submitButton.disabled = true;
+        submitButton.textContent = "Placing Call...";
+
+        try {
+          const response = await fetch("https://api." + apiRegion + "/api/v2/conversations/calls", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + accessToken
+            },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await response.json().catch(function () {
+            return {};
+          });
+
+          if (!response.ok) {
+            throw new Error(data.message || "Request failed with status " + response.status);
+          }
+
+          setSuccess("Call request submitted successfully.", data);
+        } catch (error) {
+          setError(error.message || "Unable to place the call.");
+        } finally {
+          submitButton.disabled = false;
+          submitButton.textContent = "Place Call";
+        }
+      });
+    </script>
+  </body>
+</html>
